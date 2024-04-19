@@ -1,22 +1,20 @@
 package main
 
 import (
-	"fmt"
+	handlers "github.com/odmrs/gosound-api/internal"
 	"log"
 	"net/http"
 	"os"
 	"time"
 )
 
-func apiHealth(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "ONLINE")
-}
+const status string = "on"
 
 func main() {
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/v1/gosoundapi", apiHealth)
+	mux.HandleFunc("/v1/gosoundapi", handlers.StatusOn)
 
 	s := &http.Server{
 		Addr:         ":4000",
