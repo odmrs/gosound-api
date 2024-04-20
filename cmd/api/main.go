@@ -14,7 +14,8 @@ func main() {
 	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/v1/gosoundapi", handlers.StatusOn)
+	mux.HandleFunc("GET /v1/gosoundapi", handlers.StatusOn)
+	mux.HandleFunc("POST /v1/gosoundapi/tts", handlers.Tts)
 
 	s := &http.Server{
 		Addr:         ":4000",
