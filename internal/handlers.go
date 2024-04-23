@@ -3,7 +3,9 @@ package handlers
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 )
 
 var status string = "on"
@@ -43,13 +45,31 @@ func StatusOn(w http.ResponseWriter, r *http.Request) {
 }
 
 func Tts(w http.ResponseWriter, r *http.Request) {
-	decoder := json.NewDecoder(r.Body)
 	var textDecoded textToSpeech
+	w.Header().Set("Content-Type", "audio/mpeg")
+	w.Header().Set("Content-Disposition", "attachment; filename=\"speech.mp3\"")
+
+	decoder := json.NewDecoder(r.Body)
 
 	err := decoder.Decode(&textDecoded)
 	if err != nil {
-		panic(err)
+		log.Panic(err)
 	}
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte(textDecoded.Text))
+
+	audioPath, err := convertTextToAudio(textDecoded.Text)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	audioData, err := os.ReadFile(audioPath)
+	if err != nil {
+		http.Error(w, "Error to read audio file", http.StatusInternalServerError)
+	}
+
+	w.Write(audioData)
+	log.Println("Audio sended")
+
+	if err := os.Remove(audioPath); err != nil {
+		log.Printf("Failed to remove audio file %v", err)
+	}
 }
