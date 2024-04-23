@@ -20,6 +20,7 @@ type textToSpeech struct {
 	Text string `json:"text"`
 }
 
+// Show the status of api
 func StatusOn(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	if status != "on" {
@@ -44,10 +45,11 @@ func StatusOn(w http.ResponseWriter, r *http.Request) {
 	w.Write(statusOffJson)
 }
 
+// Handler -> Text to Speech
 func Tts(w http.ResponseWriter, r *http.Request) {
 	var textDecoded textToSpeech
 	w.Header().Set("Content-Type", "audio/mpeg")
-	w.Header().Set("Content-Disposition", "attachment; filename=\"speech.mp3\"")
+	w.Header().Set("Content-Disposition", "attachment; filename=\"audio.mp3\"")
 
 	decoder := json.NewDecoder(r.Body)
 
@@ -72,4 +74,11 @@ func Tts(w http.ResponseWriter, r *http.Request) {
 	if err := os.Remove(audioPath); err != nil {
 		log.Printf("Failed to remove audio file %v", err)
 	}
+}
+
+func Stt(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "audio/mpeg")
+	w.Header().Set("Content-Disposition", "attachment; filename=\"speech.mp3\"")
+
+	downloadAudio(r)
 }

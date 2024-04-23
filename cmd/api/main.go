@@ -16,7 +16,8 @@ func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /v1/gosoundapi", handlers.StatusOn)
 	mux.HandleFunc("POST /v1/gosoundapi/tts", handlers.Tts)
-
+  mux.HandleFunc("POST /v1/gosoundapi/stt", handlers.Stt)
+  
 	s := &http.Server{
 		Addr:         ":4000",
 		Handler:      mux,

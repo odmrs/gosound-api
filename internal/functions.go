@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"net/http"
 	"os"
 	"path/filepath"
-
+  "io"
+  "log"
 	"github.com/hegedustibor/htgo-tts"
 )
 
@@ -38,4 +40,32 @@ func getFile(dir string) (string, error) {
 	}
 
 	return file, nil
+}
+
+// TODO Improve this code
+func downloadAudio(r *http.Request) {
+  r.ParseMultipartForm(10 << 20)
+
+	file, header, err := r.FormFile("audio")
+	if err != nil {
+		log.Panic(err)
+	}
+	defer file.Close()
+
+	filePath := "./internal/speech/" + header.Filename
+
+	out, err := os.Create(filePath)
+
+	if err != nil {
+		log.Panic(err)
+	}
+
+	defer out.Close()
+
+	_, err = io.Copy(out, file)
+	if err != nil {
+		log.Panic(err)
+	}
+
+	log.Println("Download file with success")
 }
