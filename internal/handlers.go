@@ -80,5 +80,12 @@ func Stt(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "audio/mpeg")
 	w.Header().Set("Content-Disposition", "attachment; filename=\"speech.mp3\"")
 
-	downloadAudio(r)
+	path := downloadAudio(r)
+	jsonResponse, err := uploadFile(path)
+	if err != nil {
+		log.Panic(err)
+	}
+	w.Header().Set("Content-Type", "application/json")
+
+	w.Write(jsonResponse)
 }
