@@ -5,6 +5,10 @@ import (
 	"log"
 	"net/http"
 	"os"
+
+	"github.com/odmrs/gosound-api/pkg/audio"
+	"github.com/odmrs/gosound-api/pkg/download"
+	"github.com/odmrs/gosound-api/pkg/upload"
 )
 
 type statusCode struct {
@@ -18,16 +22,16 @@ type textToSpeech struct {
 }
 
 // Show the status of api
-func StatusOn(w http.ResponseWriter, r *http.Request) {
+func Status(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	statusOn := &statusCode{
+	status := &statusCode{
 		Code:    http.StatusOK,
 		Status:  "Online",
 		Message: "API is running smoothly",
 	}
 
-	statusJson, _ := json.Marshal(statusOn)
+	statusJson, _ := json.Marshal(status)
 	if _, err := w.Write(statusJson); err != nil {
 		log.Panicf("Error to parssing statusJson to json, error: %v", err)
 	}
@@ -46,7 +50,7 @@ func Tts(w http.ResponseWriter, r *http.Request) {
 		log.Panic(err)
 	}
 
-	audioPath, err := convertTextToAudio(textDecoded.Text)
+	audioPath, err := audio.ConvertTextToAudio(textDecoded.Text)
 	if err != nil {
 		log.Panic(err)
 	}
@@ -70,8 +74,8 @@ func Stt(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "audio/mpeg")
 	w.Header().Set("Content-Disposition", "attachment; filename=\"speech.mp3\"")
 
-	path := downloadAudio(r)
-	jsonResponse, err := uploadFile(path)
+	path := download.DownloadAudio(r)
+	jsonResponse, err := uploadHandler.UploadFile(path)
 	if err != nil {
 		log.Panic(err)
 	}
