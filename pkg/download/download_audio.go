@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 func DownloadAudio(r *http.Request) string {
@@ -24,7 +25,7 @@ func DownloadAudio(r *http.Request) string {
 	if err != nil {
 		log.Panicf("Error creating audio_placeholder folder")
 	}
-	filePath += "audio"
+	filePath += time.Now().Format("20060102150405.999999999")
 
 	out, err := os.Create(filePath)
 	if err != nil {
