@@ -15,7 +15,9 @@ import (
 func convertTextToAudio(text string) (string, error) {
 	// Convert audio to text
 	speech := htgotts.Speech{Folder: "./internal/audio", Language: "pt"}
-	speech.Speak(text)
+	if err := speech.Speak(text); err != nil {
+		log.Panicf("Error to try speak the text, error: %v", err)
+	}
 
 	// Return the file
 	return getFile(speech.Folder)
@@ -32,7 +34,6 @@ func getFile(dir string) (string, error) {
 
 	entry := dirEntries[0]
 	fileInfo, err := entry.Info()
-
 	if err != nil {
 		return "", err
 	}
@@ -47,7 +48,9 @@ func getFile(dir string) (string, error) {
 
 // TODO Improve this code
 func downloadAudio(r *http.Request) string {
-	r.ParseMultipartForm(10 << 20)
+	if err := r.ParseMultipartForm(10 << 20); err != nil {
+		log.Panicf("Error parsing multipart form: %v", err)
+	}
 
 	file, _, err := r.FormFile("audio")
 	if err != nil {
@@ -58,7 +61,6 @@ func downloadAudio(r *http.Request) string {
 	filePath := "./internal/speech/" + "audio"
 
 	out, err := os.Create(filePath)
-
 	if err != nil {
 		log.Panic(err)
 	}
@@ -77,7 +79,6 @@ func downloadAudio(r *http.Request) string {
 func uploadFile(path string) ([]byte, error) {
 	var targetUrl string = "http://localhost:5000/transcribe"
 	file, err := os.Open(path)
-
 	if err != nil {
 		log.Panic(err)
 	}
@@ -85,7 +86,6 @@ func uploadFile(path string) ([]byte, error) {
 	body := &bytes.Buffer{}
 	writer := multipart.NewWriter(body)
 	part, err := writer.CreateFormFile("file", file.Name())
-
 	if err != nil {
 		log.Panic(err)
 	}
@@ -106,10 +106,8 @@ func uploadFile(path string) ([]byte, error) {
 	request.Header.Add("Content-Type", writer.FormDataContentType())
 
 	// Send request
-
 	client := &http.Client{}
 	response, err := client.Do(request)
-
 	if err != nil {
 		log.Panic(err)
 	}

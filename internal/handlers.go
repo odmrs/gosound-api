@@ -2,13 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"os"
 )
-
-var status string = "on"
 
 type statusCode struct {
 	Status  string `json:"status"`
@@ -23,17 +20,6 @@ type textToSpeech struct {
 // Show the status of api
 func StatusOn(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	if status != "on" {
-		statusOff := &statusCode{
-			Code:    http.StatusServiceUnavailable,
-			Status:  "Offline",
-			Message: "API is currently offline. Please try again later",
-		}
-
-		statusOffJson, _ := json.Marshal(statusOff)
-		fmt.Fprintln(w, string(statusOffJson))
-		return
-	}
 
 	statusOn := &statusCode{
 		Code:    http.StatusOK,
@@ -41,8 +27,10 @@ func StatusOn(w http.ResponseWriter, r *http.Request) {
 		Message: "API is running smoothly",
 	}
 
-	statusOffJson, _ := json.Marshal(statusOn)
-	w.Write(statusOffJson)
+	statusJson, _ := json.Marshal(statusOn)
+	if _, err := w.Write(statusJson); err != nil {
+		log.Panicf("Error to parssing statusJson to json, error: %v", err)
+	}
 }
 
 // Handler -> Text to Speech
@@ -68,7 +56,9 @@ func Tts(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Error to read audio file", http.StatusInternalServerError)
 	}
 
-	w.Write(audioData)
+	if _, err := w.Write(audioData); err != nil {
+		log.Panicf("Error to try send audio to user, error: %v", err)
+	}
 	log.Println("Audio sended")
 
 	if err := os.Remove(audioPath); err != nil {
@@ -87,5 +77,7 @@ func Stt(w http.ResponseWriter, r *http.Request) {
 	}
 	w.Header().Set("Content-Type", "application/json")
 
-	w.Write(jsonResponse)
+	if _, err := w.Write(jsonResponse); err != nil {
+		log.Panicf("Error to try return json response to user, error: %v", err)
+	}
 }
