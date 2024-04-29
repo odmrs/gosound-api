@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"bytes"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -37,5 +38,36 @@ func TestStatus(t *testing.T) {
 
 	if string(b) != string(expected) {
 		t.Errorf("Expected: %v\nGot: %v", expected, err)
+	}
+}
+
+func TestTts(t *testing.T) {
+	jsonBody := `{"text": "Testing api"}`
+	bodyRender := bytes.NewReader([]byte(jsonBody))
+	server := httptest.NewServer(http.HandlerFunc(Tts))
+
+	resp, err := http.Post(server.URL, "audio/mpeg", bodyRender)
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Verify status code
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("Expected 200 status code, but got %d", resp.StatusCode)
+	}
+
+	// Verify audio length
+	if resp.ContentLength == 0 {
+		t.Error("Expected non-empty audio content")
+	}
+
+	// Verify Header
+	if resp.Header.Get("Content-Type") != "audio/mpeg" {
+		t.Errorf("Header error, expected: %v\nGot: %v", "audio/mpeg", resp.Header.Get("Content-Type"))
+	}
+
+	// Verify Content-Disposition"}
+	if resp.Header.Get("Content-Disposition") != `attachment; filename="audio.mp3"` {
+		t.Errorf("Content-Disposition expected: %v\nGot: %v", `attachment; filename="audio.mp3`, resp.Header.Get("Content-Disposition"))
 	}
 }
