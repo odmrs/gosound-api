@@ -7,8 +7,6 @@ import (
 	"os"
 
 	"github.com/odmrs/gosound-api/pkg/audio"
-	"github.com/odmrs/gosound-api/pkg/download"
-	"github.com/odmrs/gosound-api/pkg/upload"
 )
 
 type statusCode struct {
@@ -65,6 +63,7 @@ func Tts(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Println("Audio sended")
 
+	// Remove text -> audio
 	if err := os.Remove(audioPath); err != nil {
 		log.Printf("Failed to remove audio file %v", err)
 	}
@@ -74,8 +73,8 @@ func Stt(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "audio/mpeg")
 	w.Header().Set("Content-Disposition", "attachment; filename=\"speech.mp3\"")
 
-	path := download.DownloadAudio(r)
-	jsonResponse, err := uploadHandler.UploadFile(path)
+	path := audio.DownloadAudio(r)
+	jsonResponse, err := audio.UploadFile(path)
 	if err != nil {
 		log.Panic(err)
 	}

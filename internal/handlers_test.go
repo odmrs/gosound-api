@@ -6,6 +6,7 @@ import (
 	"io"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
@@ -69,5 +70,9 @@ func TestTts(t *testing.T) {
 	// Verify Content-Disposition"}
 	if resp.Header.Get("Content-Disposition") != `attachment; filename="audio.mp3"` {
 		t.Errorf("Content-Disposition expected: %v\nGot: %v", `attachment; filename="audio.mp3`, resp.Header.Get("Content-Disposition"))
+	}
+
+	if err := os.RemoveAll("./pkg"); err != nil {
+		t.Errorf("Error try remove trash files, error: %v", err)
 	}
 }
