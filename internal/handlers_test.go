@@ -76,3 +76,35 @@ func TestTts(t *testing.T) {
 		t.Errorf("Error try remove trash files, error: %v", err)
 	}
 }
+
+func TestStt(t *testing.T) {
+	resp, err := http.Get("http://localhost:5000/checkhealth")
+	if err != nil {
+		t.Errorf("Error in python api %v", err)
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		t.Error("Python server offline")
+	}
+
+	server := httptest.NewServer(http.HandlerFunc(Status))
+	resp, err = http.Get(server.URL)
+	if err != nil {
+		t.Error(err)
+	}
+
+	// Verify Header
+	if resp.Header.Get("Content-Type") != "application/json" {
+		t.Errorf("Header error, expected: %v\nGot %v", "application/json", resp.Header.Get("Content-Type"))
+	}
+
+	b, err := io.ReadAll(resp.Body)
+	if err != nil {
+		t.Error(err)
+	}
+
+	if string(b) == "" {
+		t.Error("Expected some json as return, receive nothing")
+	}
+}
