@@ -82,7 +82,7 @@ func GetFile(dir string) (string, error) {
 }
 
 func UploadFile(path string) ([]byte, error) {
-	var targetUrl string = "http://localhost:5000/transcribe"
+	var targetUrl string = "http://api-python:5000/transcribe"
 	file, err := os.Open(path)
 	if err != nil {
 		log.Panic(err)
