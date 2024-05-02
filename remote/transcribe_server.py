@@ -27,5 +27,12 @@ def transcribe():
     except Exception as e:
         return str(e), 500
 
+@app.route('/checkhealth', methods=['GET'])
+def check_health():
+    return jsonify({
+        "httpStatusCode": 200,
+        "status": "Online",
+        "message": "API is running smoothly"
+    })
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
