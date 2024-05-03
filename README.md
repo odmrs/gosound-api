@@ -12,6 +12,7 @@
 * Authenticated users can access all causes as well as create a new cause, edit their created cause and also delete what they've created.
 ### Installation Local
 * Clone this repositorie.
+* Install a model you will want [here](https://alphacephei.com/vosk/models) and put inside 'remote/' directory
 ### Usage
 * Run:
 ```shell

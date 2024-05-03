@@ -22,6 +22,6 @@ COPY --from=builder /usr/src/app/main .
 
 ENV PKG_CONFIG_PATH=/usr/lib/pkgconfig:$PKG_CONFIG_PATH
 
-CMD ["./main"]
-
 EXPOSE 4000
+
+CMD ["./main"]
