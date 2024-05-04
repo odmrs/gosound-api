@@ -12,8 +12,8 @@
 * Authenticated users can access all causes as well as create a new cause, edit their created cause and also delete what they've created.
 ### Installation Local
 * Clone this repositorie.
-* Install a model you will want [here](https://alphacephei.com/vosk/models) and put inside 'remote/' directory
-### Usage
+* Download a voice model of your choice [here](https://alphacephei.com/vosk/models),extract, rename the folder to “models” and place it inside remote/
+## Usage
 * Run:
 ```shell
 docker-compose up -d
