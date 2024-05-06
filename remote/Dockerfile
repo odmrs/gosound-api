@@ -1,13 +1,5 @@
-
-
-
-# Use an official Python runtime as a parent image
 FROM python:3.12-slim as builder
-
-WORKDIR /app
-
-FROM python:3.12-slim as builder
-
+ 
 WORKDIR /app
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -23,11 +15,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     dbus-x11 && \
     rm -rf /var/lib/apt/lists/*
 
-COPY requirements.txt .
+COPY . .
 
 RUN pip install --no-cache-dir -r requirements.txt
-
-COPY . .
 
 EXPOSE 5000
 
