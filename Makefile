@@ -1,10 +1,7 @@
-.PHONY: run
-run: run-go run-py
+run:
+	docker-compose up -d
 
-run-go:
-	@echo "Starting Go API..."
-	@go run cmd/api/main.go &
 
-run-py:
-	@echo "Starting Python API..."
-	@cd remote/ && python transcribe_server.py &
+build:
+	chmod +x setup.sh && ./setup.sh
+	docker-compose up --build

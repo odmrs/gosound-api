@@ -12,11 +12,15 @@
 * Authenticated users can access all causes as well as create a new cause, edit their created cause and also delete what they've created.
 ### Installation Local
 * Clone this repositorie.
-* Download a voice model of your choice [here](https://alphacephei.com/vosk/models),extract, rename the folder to “models” and place it inside remote/
+* Download a voice model of your choice [here](https://alphacephei.com/vosk/models),extract, rename the folder to “models” and place it inside remote or just run:
+```
+make build
+```
+- This command will run the shell script to download, extract and rename the directory and execute the docker-compose --build
 ## Usage
-* Run:
-```shell
-docker-compose up -d
+* Run: -> Just run without build the docker images
+```
+make run
 ```
 * Connect to the API using a request with browser or Insomnia/Postman on port 4000.
 ### API Endpoints
