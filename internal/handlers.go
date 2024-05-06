@@ -40,6 +40,11 @@ func Tts(w http.ResponseWriter, r *http.Request) {
 	var textDecoded textToSpeech
 	w.Header().Set("Content-Type", "audio/mpeg")
 	w.Header().Set("Content-Disposition", "attachment; filename=\"audio.mp3\"")
+	if r.Body == http.NoBody {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(audio.NewBadRequestError("the request body is empty; use the json tag 'text' with the value you want to hear"))
+		return
+	}
 
 	decoder := json.NewDecoder(r.Body)
 
@@ -73,7 +78,7 @@ func Stt(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "audio/mpeg")
 	w.Header().Set("Content-Disposition", "attachment; filename=\"speech.mp3\"")
 
-	path := audio.DownloadAudio(r)
+	path := audio.DownloadAudio(r, w)
 	jsonResponse, err := audio.UploadFile(path)
 	if err != nil {
 		log.Panic(err)

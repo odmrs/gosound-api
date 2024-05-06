@@ -2,6 +2,7 @@ package audio
 
 import (
 	"bytes"
+	"encoding/json"
 	"io"
 	"log"
 	"mime/multipart"
@@ -12,6 +13,22 @@ import (
 
 	"github.com/hegedustibor/htgo-tts"
 )
+
+type RestErr struct {
+	Message string `json:"message"`
+	Err     string `json:"error,omitempty"`
+	Code    int    `json:"code"`
+}
+
+// Bad Request Error
+
+func NewBadRequestError(message string) *RestErr {
+	return &RestErr{
+		Message: message,
+		Err:     "bad_request",
+		Code:    http.StatusBadRequest,
+	}
+}
 
 // Convert audio to text
 func ConvertTextToAudio(text string) (string, error) {
@@ -24,14 +41,15 @@ func ConvertTextToAudio(text string) (string, error) {
 	return GetFile(speech.Folder)
 }
 
-func DownloadAudio(r *http.Request) string {
+func DownloadAudio(r *http.Request, w http.ResponseWriter) string {
 	if err := r.ParseMultipartForm(10 << 20); err != nil {
 		log.Panicf("Error parsing multipart form: %v", err)
 	}
 
 	file, _, err := r.FormFile("audio")
 	if err != nil {
-		log.Panic(err)
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(NewBadRequestError("the request body is empty; use the 'audio' name with the value of your audio as formularie"))
 	}
 	defer file.Close()
 
