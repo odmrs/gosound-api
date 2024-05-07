@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
@@ -31,7 +32,8 @@ func Status(w http.ResponseWriter, r *http.Request) {
 
 	statusJson, _ := json.Marshal(status)
 	if _, err := w.Write(statusJson); err != nil {
-		log.Panicf("Error to parssing statusJson to json, error: %v", err)
+		err := fmt.Errorf(err.Error(), "Error to parssing statusJson to json")
+		fmt.Println(err.Error())
 	}
 }
 
@@ -42,6 +44,8 @@ func Tts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Disposition", "attachment; filename=\"audio.mp3\"")
 	if r.Body == http.NoBody {
 		w.WriteHeader(http.StatusBadRequest)
+		err := fmt.Errorf("No body in request")
+		fmt.Println(err.Error())
 		json.NewEncoder(w).Encode(audio.NewBadRequestError("the request body is empty; use the json tag 'text' with the value you want to hear"))
 		return
 	}
@@ -50,12 +54,16 @@ func Tts(w http.ResponseWriter, r *http.Request) {
 
 	err := decoder.Decode(&textDecoded)
 	if err != nil {
-		log.Panic(err)
+		w.WriteHeader(http.StatusBadRequest)
+		err := fmt.Errorf("error when trying to decode the Text sent by the user")
+		fmt.Println(err.Error())
 	}
 
 	audioPath, err := audio.ConvertTextToAudio(textDecoded.Text)
 	if err != nil {
-		log.Panic(err)
+		w.WriteHeader(http.StatusBadRequest)
+		err := fmt.Errorf("error to trying convert text to audio")
+		fmt.Println(err.Error())
 	}
 
 	audioData, err := os.ReadFile(audioPath)
@@ -64,7 +72,9 @@ func Tts(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if _, err := w.Write(audioData); err != nil {
-		log.Panicf("Error to try send audio to user, error: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		err := fmt.Errorf("error when trying to send audio to user")
+		fmt.Println(err.Error())
 	}
 	log.Println("Audio sended")
 
@@ -81,11 +91,15 @@ func Stt(w http.ResponseWriter, r *http.Request) {
 	path := audio.DownloadAudio(r, w)
 	jsonResponse, err := audio.UploadFile(path)
 	if err != nil {
-		log.Panic(err)
+		w.WriteHeader(http.StatusBadRequest)
+		err := fmt.Errorf("error when trying send audio to api python")
+		fmt.Println(err.Error())
 	}
 	w.Header().Set("Content-Type", "application/json")
 
 	if _, err := w.Write(jsonResponse); err != nil {
-		log.Panicf("Error to try return json response to user, error: %v", err)
+		w.WriteHeader(http.StatusBadRequest)
+		err := fmt.Errorf("error when trying to send jsonResponse to user")
+		fmt.Println(err.Error())
 	}
 }
