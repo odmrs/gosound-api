@@ -44,7 +44,7 @@ func Tts(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Disposition", "attachment; filename=\"audio.mp3\"")
 	if r.Body == http.NoBody {
 		w.WriteHeader(http.StatusBadRequest)
-		err := fmt.Errorf("No body in request")
+		err := fmt.Errorf("no body in request")
 		fmt.Println(err.Error())
 		json.NewEncoder(w).Encode(audio.NewBadRequestError("the request body is empty; use the json tag 'text' with the value you want to hear"))
 		return

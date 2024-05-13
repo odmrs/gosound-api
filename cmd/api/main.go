@@ -10,7 +10,7 @@ import (
 
 func main() {
 	mux := http.NewServeMux()
-	mux.HandleFunc("GET /v1/gosoundapi", handlers.Status)
+	mux.HandleFunc("GET /ping", handlers.Status)
 	mux.HandleFunc("POST /v1/gosoundapi/tts", handlers.Tts)
 	mux.HandleFunc("POST /v1/gosoundapi/stt", handlers.Stt)
 
